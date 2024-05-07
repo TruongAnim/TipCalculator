@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,7 +39,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.tipcalculator.ui.theme.Purple40
 import com.example.tipcalculator.ui.theme.TipCalculatorTheme
 import java.text.NumberFormat
 
@@ -51,6 +51,14 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+@VisibleForTesting
+fun calculateTip(amount: Float, tipPercent: Float, isRound: Boolean): Float {
+    if (isRound) {
+        return (amount * tipPercent / 100 + 0.5f).toInt().toFloat()
+    }
+    return amount * tipPercent / 100
 }
 
 @Composable
@@ -100,11 +108,10 @@ fun TipCalculatorApp() {
     val getTip: () -> Float = label@{
         val amountF = amount.toFloatOrNull() ?: 0f
         val tipPercentF = tipPercent.toFloatOrNull() ?: 0f
-        if (isRound) {
-            return@label (amountF * tipPercentF / 100 + 0.5f).toInt().toFloat()
-        }
-        amountF * tipPercentF / 100
+        calculateTip(amount = amountF, tipPercent = tipPercentF, isRound = isRound)
     }
+
+
     Surface(
         modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
     ) {
